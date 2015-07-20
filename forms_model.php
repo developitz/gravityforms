@@ -2259,20 +2259,13 @@ class GFFormsModel {
 		return apply_filters( 'gform_input_masks', $masks );
 	}
 
-	private static function get_default_post_title() {
-		global $wpdb;
-		$title = 'Untitled';
-		$count = 1;
+    private static function get_default_post_title() {
+        global $wpdb;
 
-		$titles = $wpdb->get_col( "SELECT post_title FROM $wpdb->posts WHERE post_title like '%Untitled%'" );
-		$titles = array_values( $titles );
-		while ( in_array( $title, $titles ) ) {
-			$title = "Untitled_$count";
-			$count ++;
-		}
+        $current_count = $wpdb->get_var( "SELECT REPLACE(post_title, 'Untitled_', '') as post_title FROM $wpdb->posts WHERE post_title LIKE 'Untitled%' ORDER BY LENGTH(post_title) DESC, post_title DESC LIMIT 1;" );
 
-		return $title;
-	}
+        return 'Untitled_' . ($current_count + 1);
+    }
 
 	public static function prepare_date( $date_format, $value ) {
 		$format    = empty( $date_format ) ? 'mdy' : $date_format;
